@@ -6,9 +6,10 @@ interface ProfileSectionProps {
   user: User;
   userPets: Pet[];
   onRadiusChange: (radius: number) => void;
+  onLogout: () => void;
 }
 
-export function ProfileSection({ user, userPets, onRadiusChange }: ProfileSectionProps) {
+export function ProfileSection({ user, userPets, onRadiusChange, onLogout }: ProfileSectionProps) {
   const [showSettings, setShowSettings] = useState(false);
   const [discoveryRadius, setDiscoveryRadius] = useState(user.discoveryRadius);
 
@@ -185,6 +186,7 @@ export function ProfileSection({ user, userPets, onRadiusChange }: ProfileSectio
               Notification Preferences
             </button>
             <button className="w-full text-left px-4 py-3 rounded-lg hover:bg-red-50 transition-colors text-red-600">
+              onClick={onLogout}
               Sign Out
             </button>
           </div>

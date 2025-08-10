@@ -2,7 +2,7 @@ export interface Pet {
   id: string;
   name: string;
   age: number;
-  petType: 'Dog' | 'Cat' | 'Bird' | 'Other';
+  petType: 'Dog' | 'Cat' | 'Bird' | 'Livestock' | 'Pet Services' | 'Pet Products' | 'Other';
   breed: string;
   purpose: 'For Sale' | 'For Adoption' | 'For Breeding';
   price?: number;

@@ -174,4 +174,83 @@ export const mockPets: Pet[] = [
     ownerId: 'owner6',
     createdAt: new Date('2024-01-12')
   }
+  ,
+  {
+    id: 'pet7',
+    name: 'Holstein Cow',
+    age: 3,
+    petType: 'Livestock',
+    breed: 'Holstein',
+    purpose: 'For Sale',
+    price: 2500,
+    sex: 'Female',
+    location: {
+      country: 'USA',
+      state: 'California',
+      city: 'Modesto',
+      coordinates: { lat: 37.6391, lng: -120.9969 }
+    },
+    description: 'Healthy Holstein cow, excellent milk producer. Well-maintained and vaccinated.',
+    phone: '+1-555-0128',
+    images: [
+      'https://images.pexels.com/photos/422218/pexels-photo-422218.jpeg?auto=compress&cs=tinysrgb&w=500'
+    ],
+    rating: 4.3,
+    ratingCount: 6,
+    featured: false,
+    ownerId: 'owner7',
+    createdAt: new Date('2024-01-22')
+  },
+  {
+    id: 'pet8',
+    name: 'Pet Grooming Service',
+    age: 0,
+    petType: 'Pet Services',
+    breed: 'Professional Grooming',
+    purpose: 'For Sale',
+    price: 50,
+    sex: 'Male',
+    location: {
+      country: 'USA',
+      state: 'California',
+      city: 'Los Angeles',
+      coordinates: { lat: 34.0522, lng: -118.2437 }
+    },
+    description: 'Professional pet grooming services. Full service grooming, nail trimming, and bathing.',
+    phone: '+1-555-0129',
+    images: [
+      'https://images.pexels.com/photos/6568461/pexels-photo-6568461.jpeg?auto=compress&cs=tinysrgb&w=500'
+    ],
+    rating: 4.9,
+    ratingCount: 45,
+    featured: true,
+    ownerId: 'owner8',
+    createdAt: new Date('2024-01-28')
+  },
+  {
+    id: 'pet9',
+    name: 'Premium Dog Food',
+    age: 0,
+    petType: 'Pet Products',
+    breed: 'Organic Dog Food',
+    purpose: 'For Sale',
+    price: 75,
+    sex: 'Male',
+    location: {
+      country: 'USA',
+      state: 'California',
+      city: 'San Francisco',
+      coordinates: { lat: 37.7749, lng: -122.4194 }
+    },
+    description: 'Premium organic dog food made with natural ingredients. Perfect for all dog breeds.',
+    phone: '+1-555-0130',
+    images: [
+      'https://images.pexels.com/photos/7788009/pexels-photo-7788009.jpeg?auto=compress&cs=tinysrgb&w=500'
+    ],
+    rating: 4.6,
+    ratingCount: 23,
+    featured: false,
+    ownerId: 'owner9',
+    createdAt: new Date('2024-01-30')
+  }
 ];

@@ -38,6 +38,7 @@ export function AddProfileSection() {
   const [successMessage, setSuccessMessage] = useState('');
 
   const petTypes = ['Dog', 'Cat', 'Bird', 'Other'];
+  const petTypes = ['Dog', 'Cat', 'Bird', 'Livestock', 'Pet Services', 'Pet Products', 'Other'];
   const sexOptions = ['Male', 'Female'];
   const purposeOptions = ['For Sale', 'For Adoption', 'For Breeding'];
 

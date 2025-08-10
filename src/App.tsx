@@ -25,10 +25,45 @@ function App() {
   const [filters, setFilters] = useState<{ petType?: string; purpose?: string }>({});
   const [selectedPet, setSelectedPet] = useState<Pet | null>(null);
 
+  // Load auth state and ratings from localStorage on app start
+  useEffect(() => {
+    const savedAuthState = localStorage.getItem('authState');
+    const savedRatings = localStorage.getItem('ratings');
+    
+    if (savedAuthState) {
+      try {
+        const parsedAuthState = JSON.parse(savedAuthState);
+        setAuthState(parsedAuthState);
+      } catch (error) {
+        console.error('Error parsing saved auth state:', error);
+      }
+    }
+    
+    if (savedRatings) {
+      try {
+        const parsedRatings = JSON.parse(savedRatings);
+        setRatings(parsedRatings);
+      } catch (error) {
+        console.error('Error parsing saved ratings:', error);
+      }
+    }
+  }, []);
+
+  // Save ratings to localStorage whenever ratings change
+  useEffect(() => {
+    localStorage.setItem('ratings', JSON.stringify(ratings));
+  }, [ratings]);
   // Get user's pets
   const userPets = authState.user ? pets.filter(pet => authState.user!.petProfiles.includes(pet.id)) : [];
 
   const handleAuth = (user: AuthUser) => {
+    const newAuthState = {
+      user,
+      isAuthenticated: true,
+      isLoading: false
+    };
+    setAuthState(newAuthState);
+    localStorage.setItem('authState', JSON.stringify(newAuthState));
     setAuthState({
       user,
       isAuthenticated: true,
@@ -50,9 +85,22 @@ function App() {
     setAuthMode(mode);
   };
 
+  const handleLogout = () => {
+    setAuthState({
+      user: null,
+      isAuthenticated: false,
+      isLoading: false
+    });
+    localStorage.removeItem('authState');
+    localStorage.removeItem('ratings');
+    setRatings([]);
+  };
   const handleRate = (petId: string, stars: number) => {
     if (!authState.user) return;
 
+    // Check if user has already rated this pet
+    const existingRating = ratings.find(r => r.userId === authState.user!.id && r.petId === petId);
+    if (existingRating) return; // User has already rated this pet
     const newRating: Rating = {
       userId: authState.user.id,
       petId,
@@ -80,6 +128,12 @@ function App() {
 
   const handleRadiusChange = (radius: number) => {
     if (authState.user) {
+      const updatedAuthState = {
+        ...authState,
+        user: { ...authState.user, discoveryRadius: radius }
+      };
+      setAuthState(updatedAuthState);
+      localStorage.setItem('authState', JSON.stringify(updatedAuthState));
       setAuthState(prev => ({
         ...prev,
         user: prev.user ? { ...prev.user, discoveryRadius: radius } : null
@@ -131,6 +185,9 @@ function App() {
             filters={filters}
             selectedPet={selectedPet}
             onBackToDiscover={handleBackToDiscover}
+            userRatings={ratings.filter(r => r.userId === authState.user!.id)}
+            user={authState.user!}
+            onRadiusChange={handleRadiusChange}
           />
         );
       case 'explore':
@@ -150,6 +207,7 @@ function App() {
             user={authState.user!}
             userPets={userPets}
             onRadiusChange={handleRadiusChange}
+            onLogout={handleLogout}
           />
         );
       default:
@@ -160,6 +218,9 @@ function App() {
             filters={filters}
             selectedPet={selectedPet}
             onBackToDiscover={handleBackToDiscover}
+            userRatings={ratings.filter(r => r.userId === authState.user!.id)}
+            user={authState.user!}
+            onRadiusChange={handleRadiusChange}
           />
         );
     }
