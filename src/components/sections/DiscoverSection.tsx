@@ -48,6 +48,7 @@ export function DiscoverSection({ pets, onRate, filters, selectedPet, onBackToDi
     setShowNoMorePets(false);
   }, [pets, filters, selectedPet]);
 
+
   const handleRate = (petId: string, rating: number) => {
     // Check if user has already rated this pet
     const existingRating = userRatings.find(r => r.petId === petId);
@@ -128,7 +129,6 @@ export function DiscoverSection({ pets, onRate, filters, selectedPet, onBackToDi
       </div>
     );
   }
-
   if (filteredPets.length === 0) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 to-pink-50 pb-20">
@@ -164,52 +164,4 @@ export function DiscoverSection({ pets, onRate, filters, selectedPet, onBackToDi
   // Check if current pet has been rated by user
   const userRating = userRatings.find(r => r.petId === currentPet.id);
 
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-50 pb-20 pt-4">
-      <div className="container mx-auto px-4">
-        {/* Header */}
-        <div className="text-center mb-6">
-          {selectedPet && onBackToDiscover && (
-            <button
-              onClick={onBackToDiscover}
-              className="absolute top-4 left-4 p-2 bg-white rounded-full shadow-md hover:shadow-lg transition-all"
-            >
-              <ArrowLeft className="w-5 h-5 text-gray-600" />
-            </button>
-          )}
-          <h1 className="text-3xl font-bold text-gray-800 mb-2">Discover Pets</h1>
-          <p className="text-gray-600">
-            {selectedPet 
-              ? 'Rate this pet to help others find the best companions'
-              : 'Rate pets in your area to help others find the best companions'
-            }
-          </p>
-        </div>
-
-        {/* Show next button if user has already rated */}
-        {userRating && !selectedPet && (
-          <div className="mb-4 text-center">
-            <button
-              onClick={handleNextProfile}
-              className="px-6 py-3 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors"
-            >
-              Next Profile
-            </button>
-          </div>
-        )}
-
-        {/* Current Pet Card */}
-        <div className="flex justify-center">
-          <PetCard
-            key={currentPet.id}
-            pet={currentPet}
-            onRate={handleRate}
-            showRating={true}
-            showDetailedView={!!selectedPet}
-            userRating={userRating?.stars}
-          />
-        </div>
-      </div>
-    </div>
-  );
 }
