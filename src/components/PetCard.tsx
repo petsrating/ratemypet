@@ -8,9 +8,10 @@ interface PetCardProps {
   onRate?: (petId: string, rating: number) => void;
   showRating?: boolean;
   showDetailedView?: boolean;
+  userRating?: number;
 }
 
-export function PetCard({ pet, onRate, showRating = true, showDetailedView = false }: PetCardProps) {
+export function PetCard({ pet, onRate, showRating = true, showDetailedView = false, userRating }: PetCardProps) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isLiked, setIsLiked] = useState(false);
   const [hoveredStar, setHoveredStar] = useState(0);
@@ -30,6 +31,7 @@ export function PetCard({ pet, onRate, showRating = true, showDetailedView = fal
   };
 
   const handleStarClick = (rating: number) => {
+    if (userRating) return; // Prevent rating if already rated
     handleRate(rating);
   };
 
@@ -82,25 +84,35 @@ export function PetCard({ pet, onRate, showRating = true, showDetailedView = fal
         )}
 
         {/* Interactive Star Rating - Fixed Position */}
-        {showRating && onRate && (
+        {showRating && (
           <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 flex space-x-2 bg-black bg-opacity-50 rounded-full px-4 py-2">
             {[1, 2, 3, 4, 5].map((star) => (
               <button
                 key={star}
-                onClick={() => handleStarClick(star)}
-                onMouseEnter={() => setHoveredStar(star)}
-                onMouseLeave={() => setHoveredStar(0)}
-                className="transition-all duration-200 hover:scale-125"
+                onClick={() => !userRating && handleStarClick(star)}
+                onMouseEnter={() => !userRating && setHoveredStar(star)}
+                onMouseLeave={() => !userRating && setHoveredStar(0)}
+                className={`transition-all duration-200 ${!userRating ? 'hover:scale-125 cursor-pointer' : 'cursor-default'}`}
+                disabled={!!userRating}
               >
                 <Star
                   className={`w-8 h-8 ${
-                    star <= hoveredStar
+                    userRating && star <= userRating
+                      ? 'text-yellow-400 fill-yellow-400'
+                      : !userRating && star <= hoveredStar
                       ? 'text-yellow-400 fill-yellow-400'
                       : 'text-white fill-transparent'
                   }`}
                 />
               </button>
             ))}
+          </div>
+        )}
+
+        {/* User's Rating Display */}
+        {userRating && (
+          <div className="absolute top-16 right-4 bg-green-500 text-white px-3 py-1 rounded-full text-sm font-medium">
+            You rated: {userRating} ⭐
           </div>
         )}
 

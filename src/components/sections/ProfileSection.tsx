@@ -185,8 +185,10 @@ export function ProfileSection({ user, userPets, onRadiusChange, onLogout }: Pro
             <button className="w-full text-left px-4 py-3 rounded-lg hover:bg-gray-50 transition-colors text-gray-700">
               Notification Preferences
             </button>
-            <button className="w-full text-left px-4 py-3 rounded-lg hover:bg-red-50 transition-colors text-red-600">
+            <button 
               onClick={onLogout}
+              className="w-full text-left px-4 py-3 rounded-lg hover:bg-red-50 transition-colors text-red-600"
+            >
               Sign Out
             </button>
           </div>

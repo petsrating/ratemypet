@@ -64,11 +64,6 @@ function App() {
     };
     setAuthState(newAuthState);
     localStorage.setItem('authState', JSON.stringify(newAuthState));
-    setAuthState({
-      user,
-      isAuthenticated: true,
-      isLoading: false
-    });
     setShowAuthModal(false);
   };
 

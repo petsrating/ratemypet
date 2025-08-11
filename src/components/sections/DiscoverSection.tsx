@@ -48,7 +48,6 @@ export function DiscoverSection({ pets, onRate, filters, selectedPet, onBackToDi
     setShowNoMorePets(false);
   }, [pets, filters, selectedPet]);
 
-
   const handleRate = (petId: string, rating: number) => {
     // Check if user has already rated this pet
     const existingRating = userRatings.find(r => r.petId === petId);
@@ -129,6 +128,7 @@ export function DiscoverSection({ pets, onRate, filters, selectedPet, onBackToDi
       </div>
     );
   }
+
   if (filteredPets.length === 0) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 to-pink-50 pb-20">
@@ -186,19 +186,15 @@ export function DiscoverSection({ pets, onRate, filters, selectedPet, onBackToDi
           </p>
         </div>
 
-
-        {/* Show user's previous rating if exists */}
-        {userRating && (
-          <div className="mb-4 p-4 bg-blue-100 border border-blue-300 text-blue-800 rounded-lg text-center">
-            <p className="font-medium">You rated this pet {userRating.stars} stars</p>
-            {!selectedPet && (
-              <button
-                onClick={handleNextProfile}
-                className="mt-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
-              >
-                Next Profile
-              </button>
-            )}
+        {/* Show next button if user has already rated */}
+        {userRating && !selectedPet && (
+          <div className="mb-4 text-center">
+            <button
+              onClick={handleNextProfile}
+              className="px-6 py-3 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors"
+            >
+              Next Profile
+            </button>
           </div>
         )}
 
@@ -207,9 +203,10 @@ export function DiscoverSection({ pets, onRate, filters, selectedPet, onBackToDi
           <PetCard
             key={currentPet.id}
             pet={currentPet}
-            onRate={userRating ? undefined : handleRate}
-            showRating={!userRating}
+            onRate={handleRate}
+            showRating={true}
             showDetailedView={!!selectedPet}
+            userRating={userRating?.stars}
           />
         </div>
       </div>
