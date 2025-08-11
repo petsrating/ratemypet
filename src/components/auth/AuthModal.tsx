@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Mail, Lock, User, MapPin } from 'lucide-react';
+import { X, Mail, Lock, User, MapPin, Eye, EyeOff } from 'lucide-react';
 import { AuthUser } from '../../types/Auth';
 
 interface AuthModalProps {
@@ -8,6 +8,29 @@ interface AuthModalProps {
   onAuth: (user: AuthUser) => void;
   onSwitchMode: (mode: 'login' | 'register') => void;
 }
+
+// Simple user database simulation
+const USERS_KEY = 'pet_app_users';
+const getUsers = () => {
+  const users = localStorage.getItem(USERS_KEY);
+  return users ? JSON.parse(users) : [];
+};
+
+const saveUser = (user: any) => {
+  const users = getUsers();
+  users.push(user);
+  localStorage.setItem(USERS_KEY, JSON.stringify(users));
+};
+
+const findUser = (email: string, password: string) => {
+  const users = getUsers();
+  return users.find((u: any) => u.email === email && u.password === password);
+};
+
+const userExists = (email: string) => {
+  const users = getUsers();
+  return users.some((u: any) => u.email === email);
+};
 
 export function AuthModal({ mode, onClose, onAuth, onSwitchMode }: AuthModalProps) {
   const [formData, setFormData] = useState({
@@ -19,16 +42,44 @@ export function AuthModal({ mode, onClose, onAuth, onSwitchMode }: AuthModalProp
     country: ''
   });
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData(prev => ({
       ...prev,
       [e.target.name]: e.target.value
     }));
+    setError(''); // Clear error when user types
+  };
+
+  const validateForm = () => {
+    if (!formData.email || !formData.password) {
+      setError('Email and password are required');
+      return false;
+    }
+
+    if (mode === 'register') {
+      if (!formData.name) {
+        setError('Name is required');
+        return false;
+      }
+      if (formData.password.length < 6) {
+        setError('Password must be at least 6 characters');
+        return false;
+      }
+      if (userExists(formData.email)) {
+        setError('User with this email already exists');
+        return false;
+      }
+    }
+
+    return true;
   };
 
   const handleSocialAuth = async (provider: 'google' | 'facebook') => {
     setIsLoading(true);
+    setError('');
     
     // Simulate social auth
     setTimeout(() => {
@@ -56,29 +107,76 @@ export function AuthModal({ mode, onClose, onAuth, onSwitchMode }: AuthModalProp
 
   const handleEmailAuth = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
     
-    // Simulate email auth
+    if (!validateForm()) return;
+
+    setIsLoading(true);
+    setError('');
+    
+    // Simulate API delay
     setTimeout(() => {
-      const mockUser: AuthUser = {
-        id: `user_${Date.now()}`,
-        name: formData.name || 'User',
-        email: formData.email,
-        provider: 'email',
-        location: {
-          country: formData.country || 'USA',
-          state: formData.state || 'California',
-          city: formData.city || 'Los Angeles',
-          coordinates: { lat: 34.0522, lng: -118.2437 }
-        },
-        discoveryRadius: 50,
-        petProfiles: [],
-        createdAt: new Date()
-      };
-      
-      onAuth(mockUser);
-      setIsLoading(false);
-    }, 1500);
+      try {
+        if (mode === 'login') {
+          // Login logic
+          const user = findUser(formData.email, formData.password);
+          if (!user) {
+            setError('Invalid email or password');
+            setIsLoading(false);
+            return;
+          }
+
+          const authUser: AuthUser = {
+            id: user.id,
+            name: user.name,
+            email: user.email,
+            provider: 'email',
+            location: user.location,
+            discoveryRadius: user.discoveryRadius || 50,
+            petProfiles: user.petProfiles || [],
+            createdAt: new Date(user.createdAt)
+          };
+
+          onAuth(authUser);
+        } else {
+          // Register logic
+          const newUser = {
+            id: `user_${Date.now()}`,
+            name: formData.name,
+            email: formData.email,
+            password: formData.password,
+            location: {
+              country: formData.country || 'USA',
+              state: formData.state || 'California',
+              city: formData.city || 'Los Angeles',
+              coordinates: { lat: 34.0522, lng: -118.2437 }
+            },
+            discoveryRadius: 50,
+            petProfiles: [],
+            createdAt: new Date()
+          };
+
+          saveUser(newUser);
+
+          const authUser: AuthUser = {
+            id: newUser.id,
+            name: newUser.name,
+            email: newUser.email,
+            provider: 'email',
+            location: newUser.location,
+            discoveryRadius: newUser.discoveryRadius,
+            petProfiles: newUser.petProfiles,
+            createdAt: newUser.createdAt
+          };
+
+          onAuth(authUser);
+        }
+        
+        setIsLoading(false);
+      } catch (err) {
+        setError('An error occurred. Please try again.');
+        setIsLoading(false);
+      }
+    }, 1000);
   };
 
   return (
@@ -97,6 +195,13 @@ export function AuthModal({ mode, onClose, onAuth, onSwitchMode }: AuthModalProp
               <X className="w-5 h-5" />
             </button>
           </div>
+
+          {/* Error Message */}
+          {error && (
+            <div className="mb-4 p-3 bg-red-100 border border-red-300 text-red-700 rounded-lg text-sm">
+              {error}
+            </div>
+          )}
 
           {/* Social Auth Buttons */}
           <div className="space-y-3 mb-6">
@@ -140,7 +245,7 @@ export function AuthModal({ mode, onClose, onAuth, onSwitchMode }: AuthModalProp
             {mode === 'register' && (
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Full Name
+                  Full Name *
                 </label>
                 <div className="relative">
                   <User className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -159,7 +264,7 @@ export function AuthModal({ mode, onClose, onAuth, onSwitchMode }: AuthModalProp
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Email Address
+                Email Address *
               </label>
               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -177,19 +282,26 @@ export function AuthModal({ mode, onClose, onAuth, onSwitchMode }: AuthModalProp
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Password
+                Password *
               </label>
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
                 <input
-                  type="password"
+                  type={showPassword ? 'text' : 'password'}
                   name="password"
                   value={formData.password}
                   onChange={handleInputChange}
-                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  className="w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                   placeholder="Enter your password"
                   required
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                >
+                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                </button>
               </div>
             </div>
 
@@ -197,7 +309,7 @@ export function AuthModal({ mode, onClose, onAuth, onSwitchMode }: AuthModalProp
               <div className="grid grid-cols-1 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Location
+                    Location (Optional)
                   </label>
                   <div className="grid grid-cols-3 gap-2">
                     <input

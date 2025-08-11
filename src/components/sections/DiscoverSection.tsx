@@ -18,7 +18,16 @@ interface DiscoverSectionProps {
   onRadiusChange: (radius: number) => void;
 }
 
-export function DiscoverSection({ pets, onRate, filters, selectedPet, onBackToDiscover, userRatings, user, onRadiusChange }: DiscoverSectionProps) {
+export function DiscoverSection({ 
+  pets, 
+  onRate, 
+  filters, 
+  selectedPet, 
+  onBackToDiscover, 
+  userRatings, 
+  user, 
+  onRadiusChange 
+}: DiscoverSectionProps) {
   const [currentPetIndex, setCurrentPetIndex] = useState(0);
   const [filteredPets, setFilteredPets] = useState<Pet[]>(pets);
   const [showNoMorePets, setShowNoMorePets] = useState(false);
@@ -47,7 +56,6 @@ export function DiscoverSection({ pets, onRate, filters, selectedPet, onBackToDi
     setCurrentPetIndex(0);
     setShowNoMorePets(false);
   }, [pets, filters, selectedPet]);
-
 
   const handleRate = (petId: string, rating: number) => {
     // Check if user has already rated this pet
@@ -129,6 +137,7 @@ export function DiscoverSection({ pets, onRate, filters, selectedPet, onBackToDi
       </div>
     );
   }
+
   if (filteredPets.length === 0) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 to-pink-50 pb-20">
@@ -164,4 +173,45 @@ export function DiscoverSection({ pets, onRate, filters, selectedPet, onBackToDi
   // Check if current pet has been rated by user
   const userRating = userRatings.find(r => r.petId === currentPet.id);
 
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-50 pb-20 pt-4">
+      <div className="container mx-auto px-4">
+        {/* Header */}
+        {selectedPet && onBackToDiscover && (
+          <div className="mb-4">
+            <button
+              onClick={onBackToDiscover}
+              className="flex items-center text-purple-600 hover:text-purple-700 transition-colors"
+            >
+              <ArrowLeft className="w-5 h-5 mr-2" />
+              Back to Discover
+            </button>
+          </div>
+        )}
+
+        {/* Pet Card */}
+        <div className="flex justify-center">
+          <PetCard
+            pet={currentPet}
+            onRate={handleRate}
+            showRating={!userRating}
+            showDetailedView={!!selectedPet}
+            userRating={userRating?.stars}
+          />
+        </div>
+
+        {/* Next Profile Button for already rated pets */}
+        {userRating && !selectedPet && (
+          <div className="flex justify-center mt-6">
+            <button
+              onClick={handleNextProfile}
+              className="px-8 py-3 bg-white text-purple-600 rounded-full font-medium shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+            >
+              Next Profile
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
 }
